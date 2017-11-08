@@ -18,47 +18,11 @@ vector<unsigned char> readData(const string& fileName)
 	return contents;
 }
 
-// Second attempt at reading CT scans as binary file
-vector<unsigned char> readData2(const string& fileName)
-{
-	vector<unsigned char> rawFileBuffer;
-	std::ifstream in;	
-	
-	in.open(fileName, std::ios::binary);	
-	in.seekg(0, std::ios::end);
-	size_t fileSize = in.tellg();
-	in.seekg(0, std::ios::beg);
-	
-	rawFileBuffer.resize(fileSize/sizeof(unsigned char));
-
-	in.read((char*)rawFileBuffer.data(), fileSize);
-
-	std::cout << fileSize << std::endl;
-	return rawFileBuffer;
-}
-
-// Third attempt at reading CT scans as a binary file
-static std::vector<char> ReadAllBytes(char const* filename)
-{
-	std::ifstream ifs(filename, std::ios::binary | std::ios::ate);
-	std::ifstream::pos_type pos = ifs.tellg();
-
-	std::vector<char>  result(pos);
-
-	ifs.seekg(0, std::ios::beg);
-	ifs.read(&result[0], pos);
-
-	return result;
-}
-
 int main()
 {
-	auto data = readData("head-8bit.raw");
-	auto data2 = readData2("head-8bit.raw");
-	auto data3 = ReadAllBytes("head-8bit.raw");
-	for(auto c : data3)
-	{
-		std::cout << c << " ";
+	vector<uint8_t> data = readData("head-8bit.raw");
+	for(const int x : data){
+		std::cout << x << std::endl;
 	}
 	return 0;
 }
