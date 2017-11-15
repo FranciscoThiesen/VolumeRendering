@@ -146,18 +146,17 @@ int main()
 	vector<vector<unsigned int> > imagem(128, vector<unsigned int>(99, 0.0));
 	for(int i = 0; i < 128; ++i){
 		for(int k = 0; k < 99; ++k){
-			double t1 = teste.simpsonPai(2*i, k, 255, 5);
-			double t2 = teste.simpsonPai(2*i + 1, k, 255, 5);
+			double t1 = teste.simpsonPai(2*i, k, 255, 1);
+			double t2 = teste.simpsonPai(2*i + 1, k, 255, 1);
 			imagem[i][k] = (int) round(((t1 + t2)/2.0) * 255.0);
 			mx = max(imagem[i][k], mx);
 			//cout << imagem[i][k] << " ";
 		}
 		//cout << endl;
 	}
-	mx = 255;
 	out << mx << endl;
-	for(int i = 0; i < 128; ++i){
-		for(int j = 0; j < 99; ++j){
+	for(int i = 0; i < 99; ++i){
+		for(int j = 0; j < 128; ++j){
 			out << imagem[i][j] << " ";
 		}
 		out << endl;
