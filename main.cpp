@@ -3,8 +3,8 @@
 
 using namespace std;
 
-constexpr int Nx = 255;
-constexpr int Ny = 255;
+constexpr int Nx = 256;
+constexpr int Ny = 256;
 
 bool checkInt(double x)
 {
@@ -21,7 +21,7 @@ struct Simpson{
 
 	double tau(double s)
 	{
-		return (s < 0.3) ? 0.0 : 0.05*(s-0.3);
+		return (s < 0.30) ? 0.0 : (0.05 * (s - 0.3));
 	}
 
 
@@ -83,7 +83,7 @@ struct Simpson{
 		double ans = 0;
 		double fStart, fMid, fEnd, mid;
 		int lo, hi, start, end, aux;
-		int steps = ceil(b/h);
+		int steps = ceil(b/(double)h);
 
 		//cout << "numero de steps = " << steps << endl;
 		for(int step = 0; step < steps; ++step)
@@ -139,25 +139,29 @@ int main()
 	
 	Simpson teste(cpy);
 
-	unsigned int mx = 0;
+	unsigned char mx = 0;
 	out << "P2" << endl;
 	out << "128 99" << endl;
 
-	vector<vector<unsigned int> > imagem(128, vector<unsigned int>(99, 0.0));
+	vector<vector<unsigned char> > imagem(128, vector<unsigned char>(128, 0.0));
+
 	for(int i = 0; i < 128; ++i){
 		for(int k = 0; k < 99; ++k){
-			double t1 = teste.simpsonPai(2*i, k, 255, 1);
-			double t2 = teste.simpsonPai(2*i + 1, k, 255, 1);
-			imagem[i][k] = (int) round(((t1 + t2)/2.0) * 255.0);
+			cout << "Calculando i = " << i << " k = " << k << endl;
+
+			double t1 = teste.simpsonPai(2*i, k, 255, 4);
+			double t2 = teste.simpsonPai(2*i + 1, k, 255, 4);
+			imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
 			mx = max(imagem[i][k], mx);
 			//cout << imagem[i][k] << " ";
 		}
 		//cout << endl;
 	}
-	out << mx << endl;
+
+	out << (unsigned int )mx << endl;
 	for(int i = 0; i < 99; ++i){
 		for(int j = 0; j < 128; ++j){
-			out << imagem[i][j] << " ";
+			out << (unsigned int) imagem[j][i] << " ";
 		}
 		out << endl;
 	}
