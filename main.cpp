@@ -12,7 +12,9 @@ bool checkInt(double x)
 	return false;
 }
 
-struct Simpson{
+class Simpson{
+
+public:
 	vector<double> img;
 	
 	Simpson(vector<double>& vet){
@@ -68,7 +70,7 @@ struct Simpson{
 
 			//cout << "cheguei aqui 3 " << endl;
 
-			fEnd = tau(img[k*Nx*Ny + end*Nx + 1]);
+			fEnd = tau(img[k*Nx*Ny + end*Nx + i]);
 
 			ans += (h/6.0) * (fStart + 4*fMid + fEnd);
 			//cout << "sai do SimpsonFilho" << endl;
@@ -108,7 +110,7 @@ struct Simpson{
 				fMid = tau(img[k*Nx*Nx + aux*Nx + i]) * exp(resultSimpsonFilhoMid);
 			}
 
-			fEnd = tau(img[k*Nx*Ny + end*Nx + 1]) * exp(resultSimpsonFilhoEnd);
+			fEnd = tau(img[k*Nx*Ny + end*Nx + i]) * exp(resultSimpsonFilhoEnd);
 
 			ans += (h/6.0) * (fStart + 4*fMid + fEnd);
 			//cout << "terminei o step" << endl;
