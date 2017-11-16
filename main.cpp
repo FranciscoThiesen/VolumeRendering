@@ -52,9 +52,7 @@ struct Simpson{
 
 			if(step == 0) fStart = tau(img[k*Nx*Ny + start*Nx + i]);
 			else fStart = fEnd;
-			//cout << "cheguei aqui 1 " << endl;
-
-			
+			//cout << "cheguei aqui 1 " << endl;		
 
 			//cout << "cheguei aqui 2 " << endl;
 
@@ -147,21 +145,19 @@ int main()
 
 	for(int i = 0; i < 128; ++i){
 		for(int k = 0; k < 99; ++k){
-			cout << "Calculando i = " << i << " k = " << k << endl;
-
 			double t1 = teste.simpsonPai(2*i, k, 255, 4);
 			double t2 = teste.simpsonPai(2*i + 1, k, 255, 4);
 			imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
 			mx = max(imagem[i][k], mx);
-			//cout << imagem[i][k] << " ";
 		}
-		//cout << endl;
 	}
 
-	out << (unsigned int )mx << endl;
-	for(int i = 0; i < 99; ++i){
-		for(int j = 0; j < 128; ++j){
-			out << (unsigned int) imagem[j][i] << " ";
+	out << (unsigned int)mx << endl;
+
+	// imagem estava com as dimensoes invertidas, vamos escrever a transposta
+	for(int coluna = 0; coluna < 99; ++coluna){
+		for(int linha = 0; linha < 128; ++linha){
+			out << (unsigned int) imagem[linha][coluna] << " ";
 		}
 		out << endl;
 	}
