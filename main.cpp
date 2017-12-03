@@ -376,7 +376,7 @@ int main()
 	vector<unsigned char> data = readData("head-8bit.raw");
 	vector<double> cpy;
 	ofstream out;
-	out.open("saidaAdaptativo.pgm", ofstream::out);
+	out.open("saidaPassoFixo0.5.pgm", ofstream::out);
 
 	// Normalização do vetor lido para [0,1]
 	for(const unsigned int& x : data) cpy.push_back((double)x/255.0); 
@@ -393,16 +393,16 @@ int main()
 	{
 		for(int k = 0; k < 99; ++k)
 		{
-			// double t1 = teste.simpsonPrincipal(2*i, k, 255, 4.5);
-			// double t2 = teste.simpsonPrincipal(2*i + 1, k, 255, 4.5); 
-			// imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
-			// mx = max(imagem[i][k], mx);
-
-			// Descomentar para chamar Simpson Adaptativo !
-			double t1 = teste.simpsonAdaptativoPrincipal(2*i, k, 0, 255, 1e-3);
-			double t2 = teste.simpsonAdaptativoPrincipal(2*i + 1, k, 0, 255, 1e-3);
+			double t1 = teste.simpsonPrincipal(2*i, k, 255, 0.5);
+			double t2 = teste.simpsonPrincipal(2*i + 1, k, 255, 0.5); 
 			imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
 			mx = max(imagem[i][k], mx);
+
+			// Descomentar para chamar Simpson Adaptativo !
+			// double t1 = teste.simpsonAdaptativoPrincipal(2*i, k, 0, 255, 1e-3);
+			// double t2 = teste.simpsonAdaptativoPrincipal(2*i + 1, k, 0, 255, 1e-3);
+			// imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
+			// mx = max(imagem[i][k], mx);
 		}
 	}
 
@@ -418,7 +418,6 @@ int main()
 	}
 
 	cout << "Fiz um total de " << totalDeChamadas << " chamadas de simpson" << endl;
-	
 	out.close();
 
 	return 0;
