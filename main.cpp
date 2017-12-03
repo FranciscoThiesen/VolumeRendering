@@ -93,34 +93,28 @@ public:
 
 		if(!isInt(a))
 		{
-			//printf("A\n");
 			fA = interpolate(i, k, a);
 		}
 		else
 		{
-			//printf("B\n");
 			fA = tau(img[idx(k, (int)a, i)]);
 		}
 
 		if(!isInt(b))
 		{
-			//printf("A1\n");
 			fB = interpolate(i, k, b);
 		}
 		else
 		{
-			//printf("B1\n");
 			fB = tau(img[idx(k, (int)b, i)]);
 		}
 
 		if(!isInt(c))
 		{
-			//printf("A2\n");
 			fC = interpolate(i, k, c);
 		}
 		else
 		{
-			//printf("B2\n");
 			fC = tau(img[idx(k, (int)c, i)]);
 		}
 
@@ -267,32 +261,21 @@ public:
 	double simpsonAuxiliar(int i, int k, double s, double h)
 	{
 		totalDeChamadas++;
-		//cout << "entrei no simpson filho" << endl;
 		double ans = 0;
-		double fStart, fMid, fEnd, mid, start, lo, hi, end;
-		//int lo, hi, start, end;
+		double fStart, fMid, fEnd, mid, start, hi, end;
 		int steps = ceil(s/h);
-		//cout << "s = " << s << endl;
 		for(int step = 0; step < steps; ++step)
 		{
-
-			//cout << "estou no step = " << step << endl;
-
 			start = step*h;
 			end = min(s, start + h);
 			mid = (start + end) / 2.0;
-
-			//if(step == 0) fStart = tau(img[idx(k, start, i)]);
-			//else fStart = fEnd;
 			
 			if(step != 0) fStart = fEnd;
 			else if(!isInt(start)){
 				fStart = interpolate(i,k,start);
 			}
 			else fStart = tau(img[idx(k, (int)start, i)]);
-			//cout << "cheguei aqui 1 " << endl;		
-
-			//cout << "cheguei aqui 2 " << endl;
+			
 			if(!isInt(mid))
 			{
 				fMid = interpolate(i, k, mid);
@@ -310,7 +293,6 @@ public:
 			
 
 			ans += (h/6.0) * (fStart + 4*fMid + fEnd);
-			//cout << "sai do SimpsonFilho" << endl;
 		}
 		return ans;
 	}
@@ -324,11 +306,10 @@ public:
 		totalDeChamadas++;
 		double ans = 0;
 		double fStart, fMid, fEnd, mid;
-		double lo, hi, start, end;
+		double hi, start, end;
 		
 		int steps = ceil(b/(double)h);
 
-		//cout << "numero de steps = " << steps << endl;
 		for(int step = 0; step < steps; ++step)
 		{
 			start = step*h;
@@ -374,7 +355,6 @@ public:
 				fEnd = tau(img[idx(k, (int) end, i)]) * exp(resultSimpsonFilhoEnd);
 			}
 			ans += (h/6.0) * (fStart + 4*fMid + fEnd);
-			//cout << "terminei o step" << endl;
 		}
 		return ans;
 	}
@@ -408,8 +388,6 @@ int main()
 	out << "128 99" << endl;
 
 	vector<vector<unsigned char> > imagem(128, vector<unsigned char>(99, 0.0));
-	//vector<vector<unsigned char> > imagem2(128, vector<unsigned char>(128, 0.0));
-
 
 	for(int i = 0; i < 128; ++i)
 	{
