@@ -1,0 +1,68 @@
+Relatório Final da Disciplina INF1608
+
+Dentre os possíveis temas, optamos por realizar o trabalho de Visualização Volumétrica.
+
+O relatório está organizado em 5 partes, a primeira parte se encarrega de descrever o processo de desenvolvimento e as outras quatro partes se encarregam de responder as perguntas que estão no enunciado do trabalho.
+
+/////////////////////////Parte 1 - Processo de Desenvolvimento /////////////////////////////////////////
+
+Escolhemos C++ como linguagem de desenvolvimento por apresentar um bom desempenho,
+por estarmos familiarizados com a representação de ponto flutuante da linguagem 
+e também por podermos fazer uso de classes. 
+Criar uma classe Simpson na qual os valores da imagem são um atributo evitou que 
+fosse necessário passar o vetor da imagem como parâmetro para funções de forma redundante e ineficiente.
+
+Foi escolhido como objetivo inicial ler a imagem corretamente,
+implementar o método de Simpson com step inteiro fixo e escrever corretamente a saida.
+Inicialmente tivemos alguns problemas, pois estavamos escrevendo o .pgm de forma errada.
+Uma vez que o modo consertamos a escrita do .pgm, pudemos observar que a imagem de saída continuava errada.
+Depois de mais investigação, descobrimos estavamos calculando os índices (i,j,k) com 255*255*k + 255*j + i,
+ao invés de usar 256*256*k + 256*j + i. 
+Finalmente conseguimos o resultado esperado para o step fixo = 4.
+Compilamos o programa com as flags -c++=11 e -O3 e o programa rodou em aproximadamente 2s 
+e fez ~ 5 * 10^6 chamadas de Simpson.
+
+Naturalmente, o passo seguinte foi implementar a interpolação para que pudessemos 
+usar passo não-inteiro. Foi razoavelmente rápido implementar essa interpolação.
+Num primeiro momento começamos implementando a média sem pesos. Ex: f(4.2) = (f(4) + f(5))/2.0
+Depois implementamos a interpolação com média ponderada. Ex: f(4.2) = f(4) * 0.8 + f(5) * 0.2
+Os resultados obtidos foram bem semalhantes aos do passo fixo inteiro.
+Com passo 4.0 são realizadas 4.8 * 10^6 chamadas da função, já com passo = 4.5,
+são realizadas 4.3 * 10^6 chamadas da função. E as imagens produzidas são de
+qualidade bem similar.
+
+Uma vez que o Simpson com passo fixo estava devidamente implementado e testado,
+partimos para a implementação do Simpson Adaptativo que se mostrou razoavelmente
+mais difícil do que esperávamos. Tivemos que debuggar razoavelmente o código, 
+mas no fim o método de Simpson Adaptativo produzia a imagem esperada.
+Tivemos que fazer um tunning da tolerância aceita pelo nosso método adaptativo,
+e obtivemos resultados razoáveis para uma tolerância inicial de 10 ^ -4.
+
+Esbarramos com alguns detalhes na implementação do Simpson Adaptativo.
+1 - Não estavamos colocando um limite inferior para a tolerância. Isso gerava
+alguns loops infinitos
+2 - O código adaptativo chama a função quase 1000x mais do que o de step fixo.
+Ai fizemos algumas otimizações para diminuir o tempo de geração de imagem.
+Passamos a usar algumas funções inline e a flag -O3
+3 - Estavamos fazendo a comparação de double com uma tolerância pequena demais (10 ^ -9)
+
+Uma vez que os problemas foram devidamente corrigidos, fizemos a geração de imagens para
+diferentes parâmetros. Os resultados serão discutidos na próxima seção.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+1 - Seu programa gera corretamente a imagem final?
+
+Sim. O programa por nós desenvolvido gerou um crânio como o mostrado no enunciado do trabalho.
+
+
+(TODO: Ver a influencia do step fixo na qualidade da imagem)
+
