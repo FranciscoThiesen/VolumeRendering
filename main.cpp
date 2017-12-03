@@ -14,20 +14,29 @@ constexpr double minTol = 1e-7;
 
 int totalDeChamadas = 0;
 
-inline bool checkInt(double x)
+//Método que verifica se um valor double pode ser considerado inteiro dada a tolerância 1e-4
+//Params: x -> valor double a ser verificado
+inline bool isInt(double x)
 {
-	if(fabs(x - floor(x)) < 1e-4) return true;
-	return false;
+	return (fabs(x - floor(x)) < 1e-4);
 }
 
-inline int cmpDouble(double& a, double& b){
+//Método que compara dois valores double considerando uma tolerância de TOL
+//Params: a, b -> valores double a serem comparados
+//Return: se a < b -> -1, se a == b -> 0, se a > b -> 1
+inline int cmpDouble(double a, double b){
 	return (a + TOL > b) ? ((b + TOL > a) ? 0 : 1) : -1;
 }
 
+//Método que retorna a posição do vetor onde está o valor associado à uma coordenada da matriz tridimensional
+//Params: a, b, c -> coordenadas do ponto na matriz tridimensional na configuração (x,y,z)
 inline int idx(int a, int b, int c){
 	return a*Nx*Nx + b*Nx + c;
 }
 
+//Método que atualiza a tolerância considerando uma tolerância mínima
+//Params: x -> referência para o valor atual da tolerância
+//Return: se x < minTol -> x = minTol, caso contrário x continua inalterado
 inline void updateTol(double& x){
 	x = (x < minTol)? minTol : x;
 }
@@ -37,15 +46,23 @@ class Simpson{
 public:
 	vector<double> img;
 	
+	// Construtor da classe Simpsons
+	// Params: vet -> vetor normalizado entre 0 e 1
 	Simpson(vector<double>& vet){
 		img = vet;
 	}
 
+	// Método de transferência
+	// Params: s -> valor float de 0 a 1 a ser avaliado
 	inline double tau(double s)
 	{
 		return (s < 0.30) ? 0.0 : (0.05 * (s - 0.3));
 	}
 
+	// Método que calcula o valor da função tau associada a um ponto que não é inteiro usando a média ponderada
+	// dos valores da função tau dos seus vizinhos inteiros.
+	// Params: i, k -> posições da matriz tridimensional onde estamos executando a integral
+	//		   mid -> valor não inteiro que será usado para determinar os pesos associados a cada vizinho
 	double interpolate(int i, int k, double mid)
 	{
 		int lo = (int) floor(mid);
@@ -55,7 +72,13 @@ public:
 		return (w1 * tau(img[idx(k, lo, i)]) + w2 * tau(img[idx(k, hi, i)]) );
 	}
 
-	double simpsonFilhoAdaptativo(int i, int k, double a, double b, double tol)
+	// Método que executa a integração numérica através do método de Simpson adaptativo da função presente
+	// no expoente da expressão para cálculo de intensidade.
+	// Params: i, k -> posições da matriz tridimensional onde estamos executando a integral
+	//		   a -> limite inferior da chamada corrente
+	//		   b -> limite superior da chamada corrente
+	//		   tol -> tolerância máxima permitida para aceitação do valor de retorno
+	double simpsonAdaptativoAuxiliar(int i, int k, double a, double b, double tol)
 	{
 		updateTol(tol);
 
@@ -68,7 +91,7 @@ public:
 
 		double SAB, SAC_SCB;
 
-		if(!checkInt(a))
+		if(!isInt(a))
 		{
 			//printf("A\n");
 			fA = interpolate(i, k, a);
@@ -79,7 +102,7 @@ public:
 			fA = tau(img[idx(k, (int)a, i)]);
 		}
 
-		if(!checkInt(b))
+		if(!isInt(b))
 		{
 			//printf("A1\n");
 			fB = interpolate(i, k, b);
@@ -90,7 +113,7 @@ public:
 			fB = tau(img[idx(k, (int)b, i)]);
 		}
 
-		if(!checkInt(c))
+		if(!isInt(c))
 		{
 			//printf("A2\n");
 			fC = interpolate(i, k, c);
@@ -108,7 +131,7 @@ public:
 		midAC = (a + c)/2.0;
 		midCB = (c + b)/2.0;
 
-		if(!checkInt(midAC))
+		if(!isInt(midAC))
 		{
 			fAC = interpolate(i, k, midAC);
 		}
@@ -117,7 +140,7 @@ public:
 			fAC = tau(img[idx(k, (int)midAC, i)]);
 		}
 
-		if(!checkInt(midCB))
+		if(!isInt(midCB))
 		{
 			fBC = interpolate(i, k, midCB);
 		}
@@ -126,7 +149,6 @@ public:
 			fBC = tau(img[idx(k, (int)midCB, i)]);
 		}
 
-		//cout << "XEGUEI AQUI MIZERAVI" << endl;
 		SAC_SCB = (h/12.0) * (fA + 4*fAC + fC);
 		SAC_SCB += (h/12.0) * (fC + 4*fBC + fB);
 
@@ -138,12 +160,17 @@ public:
 		}
 		else
 		{
-			return simpsonFilhoAdaptativo(i, k, a, c, (tol/2.0)) + simpsonFilhoAdaptativo(i, k, c, b, (tol/2.0));
+			return simpsonAdaptativoAuxiliar(i, k, a, c, (tol/2.0)) + simpsonAdaptativoAuxiliar(i, k, c, b, (tol/2.0));
 		}
 
 	}
 
-	double adaptativeSimpson(int i, int k, double a, double b, double tol)
+	//Método para calcular a integral numéricamente usando o método de Simpson adaptativo.
+	//Params: i, k -> posições da matriz tridimensional onde estamos executando a integral
+	//		   a -> limite inferior da chamada corrente
+	//		   b -> limite superior da chamada corrente
+	//		   tol -> tolerância máxima permitida para aceitação do valor de retorno
+	double simpsonAdaptativoPrincipal(int i, int k, double a, double b, double tol)
 	{
 		updateTol(tol);
 
@@ -154,16 +181,16 @@ public:
 		double highMid = (mid + b)/2.0;
 		double h = b - a;
 
-		double resultSimpsonFilhoStart = -simpsonFilhoAdaptativo(i, k, 0.0, a, tol);
-		double resultSimpsonFilhoMid = -simpsonFilhoAdaptativo(i, k, 0.0, mid, tol);
-		double resultSimpsonFilhoEnd = -simpsonFilhoAdaptativo(i, k, 0.0, b, tol);
-		double resultSimpsonFilhoLowMid = -simpsonFilhoAdaptativo(i, k, 0.0, lowMid, tol);
-		double resultSimpsonFilhoHighMid = -simpsonFilhoAdaptativo(i, k, 0.0, highMid, tol);
+		double resultSimpsonFilhoStart = -simpsonAdaptativoAuxiliar(i, k, 0.0, a, tol);
+		double resultSimpsonFilhoMid = -simpsonAdaptativoAuxiliar(i, k, 0.0, mid, tol);
+		double resultSimpsonFilhoEnd = -simpsonAdaptativoAuxiliar(i, k, 0.0, b, tol);
+		double resultSimpsonFilhoLowMid = -simpsonAdaptativoAuxiliar(i, k, 0.0, lowMid, tol);
+		double resultSimpsonFilhoHighMid = -simpsonAdaptativoAuxiliar(i, k, 0.0, highMid, tol);
 
 		double fA, fB, fMid, fLowMid, fHighMid;
 
 
-		if(!checkInt(a))
+		if(!isInt(a))
 		{
 			fA = interpolate(i, k, a);
 		}
@@ -174,7 +201,7 @@ public:
 		fA *= exp(resultSimpsonFilhoStart);
 
 
-		if(!checkInt(b))
+		if(!isInt(b))
 		{
 			fB = interpolate(i, k, b);
 		}
@@ -185,7 +212,7 @@ public:
 		fB *= exp(resultSimpsonFilhoEnd);
 
 
-		if(!checkInt(mid))
+		if(!isInt(mid))
 		{
 			fMid = interpolate(i, k, mid);
 		}
@@ -198,7 +225,7 @@ public:
 
 		double SAB = (h/6.0) * (fA + 4*fMid + fB);
 
-		if(!checkInt(lowMid))
+		if(!isInt(lowMid))
 		{
 			fLowMid = interpolate(i, k, lowMid);
 		}
@@ -209,7 +236,7 @@ public:
 		fLowMid *= exp(resultSimpsonFilhoLowMid);
 
 
-		if(!checkInt(highMid))
+		if(!isInt(highMid))
 		{
 			fHighMid = interpolate(i, k, highMid);
 		}
@@ -229,11 +256,15 @@ public:
 		{
 			return SAC_SCB;
 		}
-		return adaptativeSimpson(i, k, a, mid, tol/2.0) + adaptativeSimpson(i, k, mid, b, tol/2.0);
+		return simpsonAdaptativoPrincipal(i, k, a, mid, tol/2.0) + simpsonAdaptativoPrincipal(i, k, mid, b, tol/2.0);
 	}
 
-	// Estamos colocando h como step inteiro inicialmente
-	double simpsonFilho(int i, int k, double s, double h)
+	//Método para cálculo da integral presente no expoente da função de intensidade usando o método de Simpson
+	//com passo fixo.
+	//Params: i, k -> posições da matriz tridimensional onde estamos executando a integral
+	//		   s -> limite superior da integral
+	//		   h -> passo tomado a cada iteração
+	double simpsonAuxiliar(int i, int k, double s, double h)
 	{
 		totalDeChamadas++;
 		//cout << "entrei no simpson filho" << endl;
@@ -255,14 +286,14 @@ public:
 			//else fStart = fEnd;
 			
 			if(step != 0) fStart = fEnd;
-			else if(!checkInt(start)){
+			else if(!isInt(start)){
 				fStart = interpolate(i,k,start);
 			}
 			else fStart = tau(img[idx(k, (int)start, i)]);
 			//cout << "cheguei aqui 1 " << endl;		
 
 			//cout << "cheguei aqui 2 " << endl;
-			if(!checkInt(mid))
+			if(!isInt(mid))
 			{
 				fMid = interpolate(i, k, mid);
 			}
@@ -271,7 +302,7 @@ public:
 				fMid = tau(img[idx(k, (int)mid, i)]);
 			}
 
-			if(!checkInt(end))
+			if(!isInt(end))
 			{
 				fEnd = interpolate(i, k, end); 
 			}
@@ -284,7 +315,11 @@ public:
 		return ans;
 	}
 
-	double simpsonPai(int i, int k, double b, double h)
+	//Método que calcula a integral numericamente utilizando método de Simpson com passo fixo
+	//Params: i, k -> posições da matriz tridimensional onde estamos executando a integral
+	//		   b -> limite superior da integral a ser calculada
+	//		   h -> tamanho do passo a ser tomado em cada iteração
+	double simpsonPrincipal(int i, int k, double b, double h)
 	{
 		totalDeChamadas++;
 		double ans = 0;
@@ -300,9 +335,9 @@ public:
 			end = min(b, start + h);
 			mid = (start + end) / 2.0;
 
-			double resultSimpsonFilhoStart = -simpsonFilho(i, k, start, h);
-			double resultSimpsonFilhoMid = -simpsonFilho(i, k, mid, h);
-			double resultSimpsonFilhoEnd = -simpsonFilho(i, k, end, h);
+			double resultSimpsonFilhoStart = -simpsonAuxiliar(i, k, start, h);
+			double resultSimpsonFilhoMid = -simpsonAuxiliar(i, k, mid, h);
+			double resultSimpsonFilhoEnd = -simpsonAuxiliar(i, k, end, h);
 
 			if(step == 0) fStart = tau(img[idx(k, start, i)]) * exp(resultSimpsonFilhoStart);
 			else fStart = fEnd;
@@ -311,7 +346,7 @@ public:
 			{
 				fStart = fEnd;
 			}
-			else if(!checkInt(start)){
+			else if(!isInt(start)){
 				fStart = interpolate(i, k, start) * exp(resultSimpsonFilhoStart);
 			}
 			else
@@ -320,7 +355,7 @@ public:
 			}
 
 
-			if(!checkInt(mid))
+			if(!isInt(mid))
 			{
 				fMid = interpolate(i, k, mid) * exp(resultSimpsonFilhoMid);
 			}
@@ -330,7 +365,7 @@ public:
 			}
 
 
-			if(!checkInt(end))
+			if(!isInt(end))
 			{
 				fEnd = interpolate(i,k,end) * exp(resultSimpsonFilhoEnd);
 			}
@@ -346,6 +381,8 @@ public:
 
 };
 
+//Método que lê arquivo de forma binária e produz vetor de unsigned char
+//Params: fileName -> nome do arquivo a ser lido
 vector<unsigned char> readData(const string& fileName)
 {	
 	ifstream file(fileName, ios::in | ios::binary);
@@ -361,7 +398,8 @@ int main()
 	ofstream out;
 	out.open("saidaAdaptativo.pgm", ofstream::out);
 
-	for(const unsigned int& x : data) cpy.push_back((double)x/255.0); // vetor normalizado [0,1]
+	// Normalização do vetor lido para [0,1]
+	for(const unsigned int& x : data) cpy.push_back((double)x/255.0); 
 	
 	Simpson teste(cpy);
 
@@ -377,14 +415,14 @@ int main()
 	{
 		for(int k = 0; k < 99; ++k)
 		{
-			// double t1 = teste.simpsonPai(2*i, k, 255, 4.5);
-			// double t2 = teste.simpsonPai(2*i + 1, k, 255, 4.5); 
+			// double t1 = teste.simpsonPrincipal(2*i, k, 255, 4.5);
+			// double t2 = teste.simpsonPrincipal(2*i + 1, k, 255, 4.5); 
 			// imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
 			// mx = max(imagem[i][k], mx);
 
 			// Descomentar para chamar Simpson Adaptativo !
-			double t1 = teste.adaptativeSimpson(2*i, k, 0, 255, 1e-5);
-			double t2 = teste.adaptativeSimpson(2*i + 1, k, 0, 255, 1e-5);
+			double t1 = teste.simpsonAdaptativoPrincipal(2*i, k, 0, 255, 1e-3);
+			double t2 = teste.simpsonAdaptativoPrincipal(2*i + 1, k, 0, 255, 1e-3);
 			imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
 			mx = max(imagem[i][k], mx);
 		}
