@@ -1,0 +1,5 @@
+Para uma tolerancia = 0.1 fiz um total de 198944 chamadas e o tempo total foi de 0.016038s
+Para uma tolerancia = 0.01 fiz um total de 34267466 chamadas e o tempo total foi de 3.075s
+Para uma tolerancia = 0.001 fiz um total de 1044523800 chamadas e o tempo total foi de 92.3071s
+Para uma tolerancia = 0.0001 fiz um total de 5521211988 chamadas e o tempo total foi de 486.805s
+Para uma tolerancia = 1e-05 fiz um total de 9279790442 chamadas e o tempo total foi de 818.145s

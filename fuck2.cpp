@@ -371,13 +371,15 @@ vector<unsigned char> readData(const string& fileName)
 	return contents;
 }
 
-int main()
+int doit(const string& saida, const double passo)
 {
 	vector<unsigned char> data = readData("head-8bit.raw");
 	vector<double> cpy;
+	ofstream arquivoTempos;
 	ofstream out;
-	out.open("saidaPassoFixo0.5.pgm", ofstream::out);
-
+	clock_t inicio, fim;
+	out.open(saida, ofstream::out);
+	arquivoTempos.open("temposFixo.txt", ofstream::app);
 	// Normalização do vetor lido para [0,1]
 	for(const unsigned int& x : data) cpy.push_back((double)x/255.0); 
 	
@@ -389,22 +391,25 @@ int main()
 
 	vector<vector<unsigned char> > imagem(128, vector<unsigned char>(99, 0.0));
 
+	inicio = clock();
+
 	for(int i = 0; i < 128; ++i)
 	{
 		for(int k = 0; k < 99; ++k)
 		{
-			double t1 = teste.simpsonPrincipal(2*i, k, 255, 0.5);
-			double t2 = teste.simpsonPrincipal(2*i + 1, k, 255, 0.5); 
+			double t1 = teste.simpsonPrincipal(2*i, k, 255, passo);
+			double t2 = teste.simpsonPrincipal(2*i + 1, k, 255, passo); 
 			imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
 			mx = max(imagem[i][k], mx);
 
 			// Descomentar para chamar Simpson Adaptativo !
-			// double t1 = teste.simpsonAdaptativoPrincipal(2*i, k, 0, 255, 1e-3);
-			// double t2 = teste.simpsonAdaptativoPrincipal(2*i + 1, k, 0, 255, 1e-3);
-			// imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
-			// mx = max(imagem[i][k], mx);
+			//double t1 = teste.simpsonAdaptativoPrincipal(2*i, k, 0, 255, tolerancia);
+			//double t2 = teste.simpsonAdaptativoPrincipal(2*i + 1, k, 0, 255, tolerancia);
+			//imagem[i][k] = (unsigned char) round(((t1 + t2)/2.0) * 255.0);
+			//mx = max(imagem[i][k], mx);
 		}
 	}
+	fim = clock();
 
 	out << (unsigned int) mx << endl;
 
@@ -417,8 +422,17 @@ int main()
 		out << endl;
 	}
 
-	cout << "Fiz um total de " << totalDeChamadas << " chamadas de simpson" << endl;
+	arquivoTempos << "Para um numero de passos = " << passo << " fiz um total de " << totalDeChamadas << " chamadas e o tempo total foi de " << (double)(fim-inicio)/CLOCKS_PER_SEC << "s" << endl;
+	//cout << "Fiz um total de " << totalDeChamadas << " chamadas de simpson" << endl;
 	out.close();
 
+	return 0;
+}
+
+int main(int argc, const char * argv[])
+{
+	string tmp = string(argv[2]);
+	double tol = stod(tmp);
+	doit(string(argv[1]), tol);
 	return 0;
 }

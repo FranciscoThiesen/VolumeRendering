@@ -1,0 +1,50 @@
+resultados:
+
+h = 10
+Fiz um total de 2002176 chamadas de simpson
+
+real	0m0.600s
+user	0m0.584s
+sys	0m0.012s
+
+h = 8.5
+Fiz um total de 2306304 chamadas de simpson
+
+real	0m0.977s
+user	0m0.972s
+sys	0m0.004s
+
+h = 6
+Fiz um total de 3294720 chamadas de simpson
+
+real	0m1.447s
+user	0m1.436s
+sys	0m0.008s
+
+h = 4.5
+Fiz um total de 4359168 chamadas de simpson
+
+real	0m3.327s
+user	0m3.300s
+sys	0m0.024s
+
+h = 3
+Fiz um total de 6488064 chamadas de simpson
+
+real	0m6.446s
+user	0m6.424s
+sys	0m0.016s
+
+h = 1.5
+Fiz um total de 12950784 chamadas de simpson
+
+real	0m26.920s
+user	0m26.912s
+sys	0m0.012s
+
+h = 0.5
+Fiz um total de 38801664 chamadas de simpson
+
+real	3m50.021s
+user	3m49.596s
+sys	0m0.076s
