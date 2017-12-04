@@ -2,7 +2,7 @@ Relatório Final da Disciplina INF1608
 
 Dentre os possíveis temas, optamos por realizar o trabalho de Visualização Volumétrica.
 
-O relatório está organizado em 5 partes, a primeira parte se encarrega de descrever o processo de desenvolvimento e as outras quatro partes se encarregam de responder as perguntas que estão no enunciado do trabalho.
+O relatório está organizado em 4 partes, a primeira parte se encarrega de descrever o processo de desenvolvimento e as outras quatro partes se encarregam de responder as perguntas que estão no enunciado do trabalho.
 
 /////////////////////////Parte 1 - Processo de Desenvolvimento /////////////////////////////////////////
 
@@ -11,6 +11,8 @@ por estarmos familiarizados com a representação de ponto flutuante da linguage
 e também por podermos fazer uso de classes. 
 Criar uma classe Simpson na qual os valores da imagem são um atributo evitou que 
 fosse necessário passar o vetor da imagem como parâmetro para funções de forma redundante e ineficiente.
+
+Debatemos sobre a implementação do método de cálculo da iluminação e concluímos que o melhor caminho para seguir na implementação seria que, para cada ponto sendo usado na aproximação de simpson da integral principal, deveríamos chamar outro método de simpson (tendo o ponto em questão como limite superior) para calcular o valor da integral do expoente. Feito isso, calcularíamos f(p) como sendo matriz[Nx * Nx * k + Nx * j + p] multiplicando a exponencial do retorno do simpson do expoente.
 
 Foi escolhido como objetivo inicial ler a imagem corretamente,
 implementar o método de Simpson com step inteiro fixo e escrever corretamente a saida.
@@ -44,25 +46,31 @@ alguns loops infinitos
 2 - O código adaptativo chama a função quase 1000x mais do que o de step fixo.
 Ai fizemos algumas otimizações para diminuir o tempo de geração de imagem.
 Passamos a usar algumas funções inline e a flag -O3
-3 - Estavamos fazendo a comparação de double com uma tolerância pequena demais (10 ^ -9)
+3 - Estávamos fazendo a comparação de double com uma tolerância pequena demais (10 ^ -9)
 
 Uma vez que os problemas foram devidamente corrigidos, fizemos a geração de imagens para
 diferentes parâmetros. Os resultados serão discutidos na próxima seção.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////// Parte 2 - Resultados /////////////////////////////////////////////
 
 
+TODO: Inserir tabelas + gráficos com análise superficial
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////// Parte 3 - Conclusões /////////////////////////////////////////////
 
+Vemos pelos dados apresentados acima que o método de Simpson Iterativo deve ter seu passo fixo definido com cuidado, visto que o tempo de execução aumenta quase que exponencialmente conforme diminuímos o passo de iteração. Isto não quer dizer que devemos tomar um passo muito grande, visto que a qualidade da imagem gerada mostra correlação negativa com o aumento do passo. Considerando que queremos um algoritmo eficiente que gere um arquivo de boa qualidade, temos que escolher um passo apropriado. Na figura<x>, vemos que para passos maiores que 4, não existe mais diferença significativa entre o tempo de processamento e o número de passos. Vemos também que não existe mais grande ganho de qualidade de imagem para passos menores que 4 e, portanto, podemos concluir que 4 é um bom passo para se adotar neste problema.
 
+Para a questão do Simpson Adaptativo, tivemos maior dificuldade na implementação do mesmo. Esperávamos que o método adaptativo fosse executar em menor tempo e utilizando menos chamadas do que o método iterativo. No entanto, o que verificamos na prática foi o exato contrário. Vimos que o número de chamadas recursivas crescia exponencialmente ao decrescer a tolerância. Vemos também que a qualidade do resultado final, considerando o tempo que demora para executar é inferior ao obtido pelo Simpson Iterativo, o que nos surpreendeu. Consideramos ainda que pode ter acontecido algum erro de implementação da nossa parte, mas fomos incapazes de detectar qualquer outra falha que pudesse comprometer o resultado final. Vemos também que o resultado final obtido na figura<x> contém falhas que não deveriam ser possíveis se considerando a tolerância de 1e-5 em uma escala de 0 a 1, ou seja 2.55 * 10^-3 de erro em uma escala de 0 a 255. 
 
-1 - Seu programa gera corretamente a imagem final?
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Sim. O programa por nós desenvolvido gerou um crânio como o mostrado no enunciado do trabalho.
+///////////////////////////////////// Parte 4 - Considerações finais ///////////////////////////////////
 
+Aqui consideramos um ponto levantado no enunciado que nos intrigou bastante. O ponto levantado é como trataríamos a situação onde mudaríamos o eixo sobre o qual executamos a integração. Após pesquisarmos, chegamos ao consenso de que a melhor forma de se implementar esta modificação seria levarmos um cálculo de uma matriz de transformação linear que representasse a "rotação" da matriz 3D. O que queremos dizer por isso é que teríamos que tratar o problema considerando os vetores diretores do plano em que estamos observando e percorrendo o vetor perpendicular ao plano para calcular a intensidade de cada pixel. Para conseguirmos percorrer a matriz considerando o novo vetor normal, precisaríamos calcular uma matriz de mudança de base que convertesse coordenadas da base canônica para coordenadas da base alpha(composta pelos vetores diretores do plano e sua normal). Com a mudança de coordenadas, poderíamos executar a geração do .pgm assim como fazemos hoje. 
 
-(TODO: Ver a influencia do step fixo na qualidade da imagem)
 
